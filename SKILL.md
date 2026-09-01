@@ -106,6 +106,14 @@ python scripts/ship.py /path/to/project
 python scripts/preview_client.py /path/to/project --request
 ```
 
+**用户粘贴 Key 时，Agent 直接代劳配置**——用户在对话里发来 Key（如「我的 AppShip Preview Key：appship-xxx」），Agent 立即创建/更新该项目 `.appship/client.json`：
+
+```json
+{"api_url": "https://cp.appship.top", "preview_key": "用户发来的Key"}
+```
+
+写好后回复「已配置好」。**绝不让用户手动创建 JSON 文件**；只有命令行直跑（不开对话）的用户才需要自己写 client.json。
+
 **临时验证 ≠ 一定返回网址。** 验证由三个维度组成：沙箱运行 × 验证方式 × 交付物。
 可能交付：Web URL / API URL / API 文档 / Agent 测试页 / 验证报告 / 日志 / Artifact。
 Web、API、Agent 可以有 URL；CLI / MCP / Worker 可以只有验证结果。

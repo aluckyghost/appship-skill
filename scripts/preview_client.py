@@ -11,7 +11,7 @@ preview_client.py — AppShip v0.4.1 / Preview Client
 配置（优先级: 项目 .appship/client.json > 全局 ~/.appship/client.json）:
     {
       "api_url": "https://cp.appship.top",
-      "preview_key": "appship-invite-xxxx"
+      "preview_key": "appship-xxxx"
     }
 
 用法:
@@ -378,7 +378,7 @@ def print_user_report(root: Path, dec: dict, out: dict, ttl_h):
             print(f"  {d['url']}   <- {'预览地址' if d['kind'] == 'web_url' else 'API 地址'}")
         elif d.get('summary'):
             print(f"  {d['summary']}")
-    print(f"  有效期：{ttl_h or '?'} 小时（到期自动销毁）")
+    print(f"  有效期：{ttl_h or '?'} 小时（到期自动销毁）｜本次临时验证免费")
     print()
     risk = head.get('risk')
     if risk is None:

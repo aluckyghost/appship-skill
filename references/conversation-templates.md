@@ -103,11 +103,24 @@
 
 首次回复：
 
-> 可以。我会先检查有没有严重问题，确认安全后，再帮你创建一个临时验证环境。
+> 可以。临时验证也是免费的。我会先检查有没有严重问题，确认安全后，帮你创建一个 24 小时临时验证环境。
+>
+> 如果还没有 Preview Key：去 iai66.com/appship/key 一键免费领取（无需注册），领到后直接发我就行。
 
 检查通过后执行 `preview_client --request`。
 
 提醒：**临时验证 ≠ 一定返回网址**（CLI/MCP/Worker 类项目交付的是验证报告，见 SKILL.md §Preview 平台规则）。未实现的能力必须明确说明，不得假装已经支持。
+
+### 用户在对话里发来 Key（最常见配置方式）
+
+用户从 https://iai66.com/appship/key 领了 Key 直接粘贴过来（如「我的 Key：appship-xxx」）。**Agent 代劳，不让用户碰任何文件**：
+
+1. 立即创建/更新项目 `.appship/client.json`（`api_url` + 用户发来的 `preview_key`）
+2. 回复：
+
+> ✅ 已配置好。以后直接说「给我个临时地址」就能用，Key 有效期 30 天（到期去 iai66.com/appship/key 重新领一个发我就行）。
+
+禁止出现「请创建 client.json 并填入以下 JSON」这类让小白手动写文件的指引——那是命令行直跑用户的用法（README 里有），对话场景永远由 Agent 代写。
 
 ### key 过期 / 无效（preview_client 报 401 时）
 
