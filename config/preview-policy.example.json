@@ -1,0 +1,33 @@
+{
+  "$comment": "AppShip v0.4.1 Preview 策略配置。复制为 preview-policy.json 后生效。Preview 域名来自平台配置：开发环境 {job_id}.test.iai66.com，正式 Preview {job_id}.appship.top；url_scheme 控制 HTTP/HTTPS（当前先用 HTTP）。",
+  "preview_domain": "test.iai66.com",
+  "preview_domain_prod": "appship.top",
+  "url_scheme": "http",
+  "region_hint": "香港/新加坡（免备案，正式国内上线再切换）",
+  "static": {
+    "ttl_hours": 24,
+    "resource": "静态目录 + Caddy，无常驻进程"
+  },
+  "container": {
+    "ttl_hours": 24,
+    "cpu": "0.25-0.4 vCPU",
+    "memory": "384-512 MB",
+    "disk": "1-3GB",
+    "idle_sleep_minutes": 30,
+    "wake": "再次访问自动唤醒"
+  },
+  "compose": {
+    "ttl_hours": 24,
+    "cpu": "0.5-1 vCPU",
+    "memory": "512MB-1GB",
+    "disk": "2GB",
+    "idle_sleep_minutes": 30,
+    "note": "隔离 Compose 环境，避免共享节点干扰"
+  },
+  "limits_common": {
+    "custom_domain": "免费 Preview 不提供",
+    "sla": "免费 Preview 无 SLA",
+    "noindex": "所有 Preview 页面 noindex，不进搜索引擎",
+    "data": "Preview 数据与生产完全隔离，禁止存放真实客户数据/生产凭证"
+  }
+}
