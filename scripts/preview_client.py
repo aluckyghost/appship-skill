@@ -10,7 +10,7 @@ preview_client.py — AppShip v0.4.1 / Preview Client
 
 配置（优先级: 项目 .appship/client.json > 全局 ~/.appship/client.json）:
     {
-      "api_url": "https://cp.test.iai66.com",
+      "api_url": "http://cp.test.appship.top",
       "preview_key": "appship-invite-xxxx"
     }
 
@@ -131,7 +131,11 @@ class ApiError(RuntimeError):
 def api_request(cfg: dict, method: str, path: str, body: dict | None = None,
                 multipart: tuple[str, bytes, str] | None = None) -> dict:
     url = cfg['api_url'].rstrip('/') + path
-    headers = {'Authorization': f"Bearer {cfg['preview_key']}"}
+    # 自标识 UA：Python-urllib 默认 UA 会被 Cloudflare 等反代按已知爬虫拦截（HTTP 403 code 1010）
+    headers = {
+        'Authorization': f"Bearer {cfg['preview_key']}",
+        'User-Agent': 'AppShip-Preview-Client/0.4.1',
+    }
 
     if multipart:
         field, data, filename = multipart
@@ -235,7 +239,7 @@ def cmd_request(root: Path, as_json: bool, wait_timeout: int = 600) -> dict:
     cfg = load_client_config(root)
     if not cfg.get('api_url') or not cfg.get('preview_key'):
         msg = ('未配置 Control Plane。请创建 ~/.appship/client.json:\n'
-               '{\n  "api_url": "https://cp.test.iai66.com",\n  "preview_key": "你的邀请key"\n}')
+               '{\n  "api_url": "http://cp.test.appship.top",\n  "preview_key": "你的邀请key"\n}')
         print(msg, file=sys.stderr) if not as_json else None
         if as_json:
             print(json.dumps({'ok': False, 'error': msg}, ensure_ascii=False))

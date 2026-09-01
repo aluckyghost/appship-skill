@@ -1,6 +1,6 @@
 {
-  "$comment": "AppShip v0.4.1 Preview 策略配置。复制为 preview-policy.json 后生效。Preview 域名来自平台配置：开发环境 {job_id}.test.iai66.com，正式 Preview {job_id}.appship.top；url_scheme 控制 HTTP/HTTPS（当前先用 HTTP）。",
-  "preview_domain": "test.iai66.com",
+  "$comment": "AppShip v0.4.1 Preview 策略配置。复制为 preview-policy.json 后生效。Preview 域名来自平台配置：预览环境 {job_id}.test.appship.top，正式 Preview {job_id}.appship.top；url_scheme 控制 HTTP/HTTPS（当前先用 HTTP）。",
+  "preview_domain": "test.appship.top",
   "preview_domain_prod": "appship.top",
   "url_scheme": "http",
   "region_hint": "香港/新加坡（免备案，正式国内上线再切换）",

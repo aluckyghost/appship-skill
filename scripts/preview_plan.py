@@ -7,7 +7,7 @@ preview_plan.py — AppShip v0.4.1 / Step 6: Preview 方案
 
 域名策略:
   Preview 域名来自平台配置，不在 Skill 内写死。
-  开发环境:       {job_id}.test.iai66.com
+  预览环境:       {job_id}.test.appship.top
   正式 Preview:   {job_id}.appship.top
   协议: url_scheme 配置项控制（当前 HTTP，后续可切 HTTPS）。
 
@@ -32,8 +32,8 @@ CONFIG_PATH = Path(__file__).parent.parent / 'config' / 'preview-policy.json'
 
 DEFAULTS = {
     # Preview 域名来自平台配置（不写死）:
-    #   开发环境 {job_id}.test.iai66.com；正式 Preview {job_id}.appship.top
-    'preview_domain': 'test.iai66.com',
+    #   预览环境 {job_id}.test.appship.top；正式 Preview {job_id}.appship.top
+    'preview_domain': 'test.appship.top',
     'preview_domain_prod': 'appship.top',
     'url_scheme': 'http',
     'region_hint': '香港/新加坡（免备案，正式国内上线再切换）',

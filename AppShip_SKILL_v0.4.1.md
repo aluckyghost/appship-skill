@@ -615,10 +615,10 @@ python scripts/preview_plan.py /path/to/project
 
 Preview 域名从平台配置读取，不在 Skill 内写死。
 
-开发环境可使用：
+预览环境可使用：
 
 ```text
-{job_id}.test.iai66.com
+{job_id}.test.appship.top
 ```
 
 正式 Preview 可使用：

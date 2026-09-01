@@ -74,8 +74,8 @@ def test_static(tmp: Path):
           gd.get('skip_reason', '')[:30])
 
     pv = run_script('preview_plan.py', d)
-    check('Preview 域名来自平台配置（开发环境 test.iai66.com）',
-          pv['preview']['preview_url'].endswith('.test.iai66.com'), pv['preview']['preview_domain'])
+    check('Preview 域名来自平台配置（预览环境 test.appship.top）',
+          pv['preview']['preview_url'].endswith('.test.appship.top'), pv['preview']['preview_domain'])
     check('Preview 协议由 url_scheme 配置（当前 http）',
           pv['preview']['preview_url'].startswith('http://'), pv['preview']['preview_url'][:16])
     check('正式 Preview 域名字段（appship.top）',

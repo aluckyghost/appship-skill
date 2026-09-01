@@ -44,7 +44,7 @@ AppShip Preview 采用邀请制。把平台发给你的 key 存为 `client.json`
 
 ```json
 {
-  "api_url": "http://cp.test.iai66.com",
+  "api_url": "http://cp.test.appship.top",
   "preview_key": "你的邀请key"
 }
 ```
