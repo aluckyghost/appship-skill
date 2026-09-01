@@ -277,6 +277,14 @@ def cmd_request(root: Path, as_json: bool, wait_timeout: int = 600) -> dict:
             break
         time.sleep(2)
 
+    # 预览地址实测：HTTPS 优先，不通回退 HTTP（DNS/边缘证书未就绪场景）
+    if out['status'] == 'RUNNING':
+        url, probe_st = resolve_preview_url(out.get('url'))
+        out['url'], out['url_probe'] = url, probe_st
+        for d in out.get('deliverables') or []:
+            if d.get('kind') in ('web_url', 'api_url') and d.get('url'):
+                d['url'], _ = resolve_preview_url(d['url'])
+
     if as_json:
         print(json.dumps(out, ensure_ascii=False, indent=2))
     elif out['status'] == 'RUNNING':
@@ -292,6 +300,37 @@ def cmd_request(root: Path, as_json: bool, wait_timeout: int = 600) -> dict:
     except Exception:
         pass  # 报告更新失败不影响预览结果
     return out
+
+
+# ---------- 预览地址探测（HTTPS 优先，不通回退 HTTP） ----------
+
+def probe_url(url: str, timeout: int = 10) -> bool:
+    """轻量探测：地址当前是否可访问（拿到任何 HTTP 响应即算通——DNS/TLS/服务可达）。"""
+    try:
+        req = urllib.request.Request(url, method='GET',
+                                     headers={'User-Agent': 'AppShip-Preview-Client/0.4.1'})
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return 200 <= resp.status < 500
+    except urllib.error.HTTPError:
+        return True  # 4xx 也是有效响应，说明地址可达
+    except Exception:
+        return False
+
+
+def resolve_preview_url(url: str):
+    """HTTPS 优先实测；不通回退 HTTP（DNS/边缘证书未就绪时不至于没地址用）。
+
+    返回 (url, status)：status ∈ ok / fallback / pending（都不通=解析生效中）。
+    """
+    if not url:
+        return url, 'unknown'
+    if probe_url(url):
+        return url, 'ok'
+    if url.startswith('https://'):
+        alt = 'http://' + url[len('https://'):]
+        if probe_url(alt):
+            return alt, 'fallback'
+    return url, 'pending'
 
 
 def print_user_report(root: Path, dec: dict, out: dict, ttl_h):
@@ -334,7 +373,15 @@ def print_user_report(root: Path, dec: dict, out: dict, ttl_h):
         print('🟢 严重安全风险：运行 ship.py 获取完整检测')
     else:
         print(f"🟢 严重安全风险：{risk} 项" if risk == 0 else f"🟡 严重安全风险：{risk} 项（需确认）")
-    print('✅ 临时验证：正常')
+    probe = out.get('url_probe')
+    if probe == 'ok':
+        print('✅ 临时验证：正常（刚实测访问，页面正常打开）')
+    elif probe == 'fallback':
+        print('✅ 临时验证：正常（HTTPS 尚未就绪，已先给 HTTP 地址）')
+    elif probe == 'pending':
+        print('⏳ 临时验证：已部署成功，地址解析生效中（几分钟内自动可用）')
+    else:
+        print('✅ 临时验证：正常')
     todo = head.get('todo')
     if todo is None:
         print('🚀 距离正式上线：运行 ship.py 获取上线清单')
