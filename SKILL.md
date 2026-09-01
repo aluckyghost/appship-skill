@@ -202,7 +202,7 @@ python scripts/preview_plan.py /path/to/project
 ```
 
 - **Preview 域名从平台配置读取，不在 Skill 内写死。**
-  预览环境：`{job_id}.test.appship.top`；正式 Preview：`{job_id}.appship.top`。
+  平台预览：`https://{job_id}.appship.top`（HTTPS 由 Cloudflare 边缘证书提供）。
 - 默认节点香港/新加坡（免备案）；正式国内上线切客户域名 + 国内云 + ICP 备案。
 - static → 静态托管；dynamic → 沙箱 Preview Runner（CPU/RAM/disk/network 平台限额）
 - TTL 由平台配置；免费 Preview 不提供自定义域名、无 SLA；所有页面 noindex/nofollow。

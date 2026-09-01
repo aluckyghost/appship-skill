@@ -74,12 +74,12 @@ def test_static(tmp: Path):
           gd.get('skip_reason', '')[:30])
 
     pv = run_script('preview_plan.py', d)
-    check('Preview 域名来自平台配置（预览环境 test.appship.top）',
-          pv['preview']['preview_url'].endswith('.test.appship.top'), pv['preview']['preview_domain'])
-    check('Preview 协议由 url_scheme 配置（当前 http）',
-          pv['preview']['preview_url'].startswith('http://'), pv['preview']['preview_url'][:16])
-    check('正式 Preview 域名字段（appship.top）',
-          pv['preview'].get('preview_domain_prod') == 'appship.top')
+    check('Preview 域名来自平台配置（appship.top）',
+          pv['preview']['preview_domain'] == 'appship.top', pv['preview']['preview_domain'])
+    check('Preview 协议由 url_scheme 配置（当前 https）',
+          pv['preview']['preview_url'].startswith('https://'), pv['preview']['preview_url'][:16])
+    check('Preview URL 格式（{job_id}.appship.top）',
+          pv['preview']['preview_url'].endswith('.appship.top'), pv['preview']['preview_url'])
 
     rep = run_script('ship.py', d)
     check('结论非 BLOCKED', rep['status'] in ('PREVIEW_READY', 'REVIEW_REQUIRED'), rep['status'])

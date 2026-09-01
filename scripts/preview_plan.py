@@ -7,9 +7,8 @@ preview_plan.py — AppShip v0.4.1 / Step 6: Preview 方案
 
 域名策略:
   Preview 域名来自平台配置，不在 Skill 内写死。
-  预览环境:       {job_id}.test.appship.top
-  正式 Preview:   {job_id}.appship.top
-  协议: url_scheme 配置项控制（当前 HTTP，后续可切 HTTPS）。
+  平台预览:  https://{job_id}.appship.top（Cloudflare 边缘证书提供 HTTPS）
+  协议: url_scheme 配置项控制（当前 https）。
 
 节点策略: 香港/新加坡（免备案）。正式国内上线切客户域名 + 国内云 + ICP 备案。
 
@@ -31,11 +30,9 @@ from deployment_decision import decide
 CONFIG_PATH = Path(__file__).parent.parent / 'config' / 'preview-policy.json'
 
 DEFAULTS = {
-    # Preview 域名来自平台配置（不写死）:
-    #   预览环境 {job_id}.test.appship.top；正式 Preview {job_id}.appship.top
-    'preview_domain': 'test.appship.top',
-    'preview_domain_prod': 'appship.top',
-    'url_scheme': 'http',
+    # Preview 域名来自平台配置（不写死）: {job_id}.appship.top（HTTPS 走 Cloudflare 边缘证书）
+    'preview_domain': 'appship.top',
+    'url_scheme': 'https',
     'region_hint': '香港/新加坡（免备案，正式国内上线再切换）',
     'static': {'ttl_hours': 24, 'resource': '静态目录 + Caddy，无常驻进程'},
     'container': {
@@ -58,7 +55,7 @@ def load_policy() -> dict:
         try:
             user_cfg = json.loads(CONFIG_PATH.read_text(encoding='utf-8'))
             policy = json.loads(json.dumps(DEFAULTS))
-            for key in ('preview_domain', 'preview_domain_prod', 'url_scheme', 'region_hint'):
+            for key in ('preview_domain', 'url_scheme', 'region_hint'):
                 if key in user_cfg:
                     policy[key] = user_cfg[key]
             for group in ('static', 'container', 'compose', 'limits_common'):
@@ -89,7 +86,6 @@ def plan(root: Path) -> dict:
         'job_id': job_id,
         'preview_url': f'{policy["url_scheme"]}://{job_id}.{policy["preview_domain"]}',
         'preview_domain': policy['preview_domain'],
-        'preview_domain_prod': policy['preview_domain_prod'],
         'url_scheme': policy['url_scheme'],
         'region_hint': policy['region_hint'],
         'verification': {

@@ -10,7 +10,7 @@ preview_client.py — AppShip v0.4.1 / Preview Client
 
 配置（优先级: 项目 .appship/client.json > 全局 ~/.appship/client.json）:
     {
-      "api_url": "http://cp.test.appship.top",
+      "api_url": "https://cp.appship.top",
       "preview_key": "appship-invite-xxxx"
     }
 
@@ -239,7 +239,7 @@ def cmd_request(root: Path, as_json: bool, wait_timeout: int = 600) -> dict:
     cfg = load_client_config(root)
     if not cfg.get('api_url') or not cfg.get('preview_key'):
         msg = ('未配置 Control Plane。请创建 ~/.appship/client.json:\n'
-               '{\n  "api_url": "http://cp.test.appship.top",\n  "preview_key": "你的邀请key"\n}')
+               '{\n  "api_url": "https://cp.appship.top",\n  "preview_key": "你的邀请key"\n}')
         print(msg, file=sys.stderr) if not as_json else None
         if as_json:
             print(json.dumps({'ok': False, 'error': msg}, ensure_ascii=False))
