@@ -166,6 +166,15 @@ def api_request(cfg: dict, method: str, path: str, body: dict | None = None,
             detail = e.read().decode()
         except Exception:
             detail = ''
+        if e.code == 401:
+            # key 过期：服务器 detail 带 expired 标记 → 给出续期指引
+            if 'expired' in detail:
+                raise ApiError(
+                    '预览 key 已过期。\n'
+                    '获取新 key：联系宇视星（iai66.com）｜企业微信：小叮') from e
+            raise ApiError(
+                '预览 key 无效。请检查 .appship/client.json 里的 preview_key '
+                '（内测 key 见 README，或联系宇视星（iai66.com））') from e
         raise ApiError(f'HTTP {e.code}: {detail}') from e
 
 
@@ -448,6 +457,14 @@ def cmd_destroy(root: Path, job_id: str, as_json: bool) -> dict:
 
 
 def main():
+    try:
+        _main()
+    except ApiError as e:
+        print(f'❌ {e}', file=sys.stderr)
+        sys.exit(1)
+
+
+def _main():
     parser = argparse.ArgumentParser(description='AppShip: Preview Client')
     parser.add_argument('project', nargs='?', help='项目路径')
     parser.add_argument('--pack', action='store_true', help='仅打包 sanitized bundle')

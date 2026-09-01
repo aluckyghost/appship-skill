@@ -40,14 +40,18 @@ AppShip 判断你现在的意图
 
 ## 使用前唯一准备：邀请 key
 
-AppShip Preview 采用邀请制。把平台发给你的 key 存为 `client.json`（放在项目 `.appship/` 目录、skill 目录或用户主目录 `~/.appship/` 任一处）：
+AppShip Preview 采用邀请制。**内测期公共 key（谁都能用，30 天有效）**：
 
 ```json
 {
   "api_url": "https://cp.appship.top",
-  "preview_key": "你的邀请key"
+  "preview_key": "appship-invite-0001"
 }
 ```
+
+存为 `client.json`（放在项目 `.appship/` 目录、skill 目录或用户主目录 `~/.appship/` 任一处）。
+
+key 过期后创建预览会提示「预览 key 已过期——获取新 key：联系宇视星（iai66.com）｜企业微信：小叮」。
 
 没有 key 也能用：本地安全检查、部署决策、上线报告全部免费。
 
