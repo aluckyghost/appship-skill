@@ -38,22 +38,26 @@ AppShip 判断你现在的意图
 
 **你全程不需要提供服务器密码或云账号 AccessKey**——免费预览由 AppShip 平台完成；正式上线走最小权限授权。
 
-## 使用前唯一准备：邀请 key
+## 使用前唯一准备：免费领取 Preview Key
 
-AppShip Preview 采用邀请制。**内测期公共 key（谁都能用，30 天有效）**：
+临时验证（Preview）需要一个免费 Key——**无需注册**，打开 [iai66.com/appship/key](https://iai66.com/appship/key) 一键领取：
+
+- 自领取起 **30 天有效**，到期回同一页面重新领取即可
+- 每个 Key 最多创建 5 次临时验证（每次 24 小时自动销毁）
+- 同一网络环境（IP）同一时间只有一个有效 Key
+
+把领到的 Key 存为 `client.json`（放在项目 `.appship/` 目录、skill 目录或用户主目录 `~/.appship/` 任一处）：
 
 ```json
 {
   "api_url": "https://cp.appship.top",
-  "preview_key": "appship-invite-0001"
+  "preview_key": "你领取的 Key"
 }
 ```
 
-存为 `client.json`（放在项目 `.appship/` 目录、skill 目录或用户主目录 `~/.appship/` 任一处）。
+key 过期后创建预览会提示「预览 key 已过期——重新领取免费 Key：iai66.com/appship/key」。
 
-key 过期后创建预览会提示「预览 key 已过期——获取新 key：联系宇视星（iai66.com）｜企业微信：小叮」。
-
-没有 key 也能用：本地安全检查、部署决策、上线报告全部免费。
+没有 Key 也能用：本地安全检查、部署决策、上线报告全部免费，永久不需要 Key。
 
 ## 命令行直跑（可选，不开对话时）
 

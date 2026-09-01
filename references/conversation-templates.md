@@ -111,14 +111,17 @@
 
 ### key 过期 / 无效（preview_client 报 401 时）
 
-客户端报错自带续期指引（「预览 key 已过期。获取新 key：联系宇视星（iai66.com）｜企业微信：小叮」），Agent 照此转述，不要自己编解决方法：
+客户端报错自带指引（「预览 key 已过期。→ 重新领取免费 Key：https://iai66.com/appship/key」），Agent 照此转述，不要自己编解决方法，也不要让用户"联系宇视星拿 key"——**领 key 是自助的**：
 
-> 你的预览 key 已过期（内测 key 有效期 30 天）。
-> 获取新 key：联系宇视星（iai66.com）｜企业微信：小叮。
+> 你的预览 key 已过期（免费 Key 自领取起 30 天有效）。
+> 重新领取（免费，无需注册）：https://iai66.com/appship/key
 >
-> 在拿到新 key 之前，本地检查、部署决策、上线报告这些功能不受影响，随时可以用。
+> 领到新 Key 后更新 `.appship/client.json` 里的 `preview_key` 即可。
+> 本地检查、部署决策、上线报告这些功能不受影响，随时可以用。
+>
+> 如果你的项目准备正式上线了：https://iai66.com
 
-key 无效（填错）时：提示用户检查 `.appship/client.json` 的 `preview_key` 是否复制完整（内测 key 见 README）。
+key 无效（填错）时：提示用户到 https://iai66.com/appship/key 领取/查看 Key，并检查 `.appship/client.json` 的 `preview_key` 是否复制完整。
 
 ---
 

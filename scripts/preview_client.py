@@ -167,14 +167,16 @@ def api_request(cfg: dict, method: str, path: str, body: dict | None = None,
         except Exception:
             detail = ''
         if e.code == 401:
-            # key 过期：服务器 detail 带 expired 标记 → 给出续期指引
+            # key 过期：服务器 detail 带 expired 标记 → 指引官网重新领取
             if 'expired' in detail:
                 raise ApiError(
                     '预览 key 已过期。\n'
-                    '获取新 key：联系宇视星（iai66.com）｜企业微信：小叮') from e
+                    '本地检查和技术报告仍可继续免费使用。\n'
+                    '→ 重新领取免费 Key：https://iai66.com/appship/key\n'
+                    '→ 准备正式上线：https://iai66.com') from e
             raise ApiError(
-                '预览 key 无效。请检查 .appship/client.json 里的 preview_key '
-                '（内测 key 见 README，或联系宇视星（iai66.com））') from e
+                '预览 key 无效。请到 https://iai66.com/appship/key 免费领取一个 Key，'
+                '然后更新 .appship/client.json 里的 preview_key') from e
         raise ApiError(f'HTTP {e.code}: {detail}') from e
 
 
@@ -247,8 +249,9 @@ def cmd_request(root: Path, as_json: bool, wait_timeout: int = 600) -> dict:
 
     cfg = load_client_config(root)
     if not cfg.get('api_url') or not cfg.get('preview_key'):
-        msg = ('未配置 Control Plane。请创建 ~/.appship/client.json:\n'
-               '{\n  "api_url": "https://cp.appship.top",\n  "preview_key": "你的邀请key"\n}')
+        msg = ('未配置 Control Plane。免费领取 Preview Key：https://iai66.com/appship/key\n'
+               '然后创建 client.json（项目 .appship/ 目录或 ~/.appship/）:\n'
+               '{\n  "api_url": "https://cp.appship.top",\n  "preview_key": "你领取的key"\n}')
         print(msg, file=sys.stderr) if not as_json else None
         if as_json:
             print(json.dumps({'ok': False, 'error': msg}, ensure_ascii=False))
