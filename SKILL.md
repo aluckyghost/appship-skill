@@ -106,10 +106,10 @@ python scripts/ship.py /path/to/project
 python scripts/preview_client.py /path/to/project --request --auto-key
 ```
 
-**Key 获取有两个来源，都免费**（话术见 `references/conversation-templates.md` PREVIEW 一节）：
+**临时验证免费，分两档**（话术见 `references/conversation-templates.md` PREVIEW 一节）：
 
-1. **临时 Key（--auto-key，首次预览零门槛）**：未配置 Key 时客户端自动领取（24 小时 / 2 次额度）并写入 `.appship/client.json`。额度用尽或过期后引导用户去官网领 30 天 Key。
-2. **30 天个人 Key（官网自助）**：用户从 https://iai66.com/appship/key 领取（无需注册，5 次额度）。
+1. **内置免费体验（--auto-key，首次预览零门槛）**：2 次临时验证（每次启用后 24 小时内有效），无需注册、无需领 Key，客户端自动配置并写入 `.appship/client.json`。**用户层话术只叫「体验额度」，不提 Key**。额度用完或到期后引导用户去官网领个人 Key。
+2. **个人 Preview Key（官网自助）**：30 天有效 / 5 次临时验证，https://iai66.com/appship/key 领取（无需注册）。
 
 **用户粘贴 Key 时，Agent 直接代劳配置**——用户在对话里发来 Key（如「我的 AppShip Preview Key：appship-xxx」），Agent 立即创建/更新该项目 `.appship/client.json`：
 

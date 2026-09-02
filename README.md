@@ -38,19 +38,20 @@ AppShip 判断你现在的意图
 
 **你全程不需要提供服务器密码或云账号 AccessKey**——免费预览由 AppShip 平台完成；正式上线走最小权限授权。
 
-## 使用前唯一准备：免费领取 Preview Key
+## 使用前唯一准备：什么都不用做
 
-临时验证（Preview）需要一个免费 Key，两种获取方式：
+**临时验证（Preview）免费，开箱即用 2 次**：在对话里让 AI 帮你预览，或命令行加 `--auto-key`，AppShip 会自动启用内置的免费体验额度（**2 次临时验证，无需注册、无需领 Key**）。
 
-**方式一：什么都不做（临时 Key）** —— 在对话里让 AI 帮你预览，或命令行加 `--auto-key`，会自动领取一个临时 Key（**24 小时有效 / 2 次额度**）。想长期用再换方式二。
+体验额度用完或到期后，想继续预览就领一个**个人 Preview Key**（免费、无需注册）：
 
-**方式二：领取 30 天 Key** —— **无需注册**，打开 [iai66.com/appship/key](https://iai66.com/appship/key) 一键领取：
+打开 [iai66.com/appship/key](https://iai66.com/appship/key) 一键领取：
 
 - 自领取起 **30 天有效**，到期回同一页面重新领取即可
-- 每个 Key 最多创建 5 次临时验证（每次 24 小时自动销毁）
+- 每个 Key 可创建 5 次临时验证（每次 24 小时自动销毁）
 - 同一网络环境（IP）同一时间只有一个有效 Key
 
-把领到的 Key 存为 `client.json`（放在项目 `.appship/` 目录、skill 目录或用户主目录 `~/.appship/` 任一处）：
+在对话里把领到的 Key 发给 AI 即可，AI 会自动帮你配置（无需手动改文件）。
+命令行直跑用户把 Key 存为 `client.json`（放在项目 `.appship/` 目录、skill 目录或用户主目录 `~/.appship/` 任一处）：
 
 ```json
 {
@@ -68,7 +69,7 @@ key 过期后创建预览会提示「预览 key 已过期——重新领取免�
 ```bash
 python scripts/ship.py ./your-project          # 一键体检：安全+运行+部署决策+上线清单
 python scripts/preview_client.py ./your-project --request    # 创建临时预览（已配置 Key 时）
-python scripts/preview_client.py ./your-project --request --auto-key   # 没配置 Key 时自动领临时 Key（24h/2 次）
+python scripts/preview_client.py ./your-project --request --auto-key   # 没配置时用内置免费体验（2 次）
 python scripts/preview_client.py ./your-project --list       # 我的预览列表
 python scripts/preview_client.py ./your-project --destroy <JOB_ID>  # 销毁预览
 ```

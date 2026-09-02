@@ -18,7 +18,7 @@ preview_client.py — AppShip v0.4.1 / Preview Client
     python scripts/preview_client.py /path/to/project --pack     # 仅打包
     python scripts/preview_client.py /path/to/project --request  # 打包+上传+等待就绪
     python scripts/preview_client.py /path/to/project --request --auto-key
-                                     # 未配置 Key 时自动领临时 Key（免费，24h/2 次）
+                                     # 未配置时启用内置免费体验（2 次临时验证，无需领 Key）
     python scripts/preview_client.py --list                      # 我的 Preview 列表
     python scripts/preview_client.py --destroy <job_id>          # 销毁
 """
@@ -62,7 +62,8 @@ def load_client_config(project_root: Path) -> dict:
     for c in candidates:
         if c.is_file():
             try:
-                return json.loads(c.read_text(encoding='utf-8'))
+                # utf-8-sig：容忍 Windows 记事本等工具写入的 BOM 头
+                return json.loads(c.read_text(encoding='utf-8-sig'))
             except (json.JSONDecodeError, OSError):
                 continue
     return {}
@@ -170,6 +171,14 @@ def api_request(cfg: dict, method: str, path: str, body: dict | None = None,
             detail = ''
         if e.code == 401:
             # key 过期：服务器 detail 带 expired 标记 → 指引官网重新领取
+            if 'temp-key expired' in detail:
+                # 体验额度过期：用户不感知 Key，话术只讲「体验额度」
+                raise ApiError(
+                    'AppShip 的免费体验额度已到有效期（每次启用后 24 小时）。\n'
+                    '本地检查和技术报告仍可继续免费使用。\n'
+                    '→ 继续预览请领取免费 Preview Key：https://iai66.com/appship/key\n'
+                    '  （30 天有效 · 5 次临时验证 · 无需注册，领取后把 Key 交给 AppShip 即可继续预览）\n'
+                    '→ 准备正式上线：https://iai66.com') from e
             if 'expired' in detail:
                 raise ApiError(
                     '预览 key 已过期。\n'
@@ -193,26 +202,27 @@ DEFAULT_API_URL = 'https://cp.appship.top'
 
 
 def ensure_temp_key(root: Path, cfg: dict, as_json: bool = False) -> dict:
-    """--auto-key：未配置 Key 时自动领取临时 Key（免费，24h / 2 次额度）并写入项目配置。
+    """--auto-key：启用 AppShip 内置的免费体验额度（2 次临时验证，无需注册、无需领 Key）。
 
-    首次预览零门槛；临时 Key 用完/过期后话术引导去官网领 30 天个人 Key。
+    实现上是向服务端领一个短期 temp key 写入项目配置，但用户层口径只叫「体验额度」。
+    额度用完/到期后话术引导去官网领 30 天个人 Preview Key。
     """
     api_url = cfg.get('api_url') or DEFAULT_API_URL
     if not as_json:
-        print('未配置 Preview Key，正在自动领取临时 Key（免费）...')
+        print('正在启用 AppShip 内置的免费体验额度...')
     resp = api_request({'api_url': api_url}, 'POST', '/v1/key/request?kind=temp', body={})
     key = resp.get('key')
     if not key:
-        raise ApiError(f'临时 Key 领取失败: {resp}')
+        raise ApiError(f'体验额度启用失败: {resp}')
     new_cfg = {'api_url': api_url, 'preview_key': key}
     target = root / '.appship' / 'client.json'
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(new_cfg, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     if not as_json:
-        print(f'✅ 已领取并保存临时 Key（{target}）')
-        print('   临时 Key：24 小时有效 / 2 次临时验证额度，到期自动失效。')
-        print('   想长期使用 → 领取 30 天免费 Key（5 次额度，无需注册）：https://iai66.com/appship/key')
-        print('   （领到后更新 client.json 里的 preview_key，或直接发给我）')
+        print(f'✅ 免费体验额度已启用（{target}）')
+        print('   内置免费体验：2 次临时验证（每次启用后 24 小时内有效）')
+        print('   需要更多临时验证 → 领取个人 Preview Key：https://iai66.com/appship/key')
+        print('   （30 天有效 · 5 次临时验证 · 无需注册，领取后把 Key 交给 AppShip 即可继续预览）')
     return new_cfg
 
 
@@ -287,15 +297,16 @@ def cmd_request(root: Path, as_json: bool, auto_key: bool = False, wait_timeout:
             try:
                 cfg = ensure_temp_key(root, cfg, as_json)
             except ApiError as e:
-                msg = f'自动领取临时 Key 失败：{e}'
+                msg = f'免费体验额度启用失败：{e}'
                 print(msg, file=sys.stderr) if not as_json else None
                 if as_json:
                     print(json.dumps({'ok': False, 'error': msg}, ensure_ascii=False))
                 sys.exit(2)
         else:
-            msg = ('未配置 Control Plane。两种方式：\n'
-                   '① 让 AI 直接帮你领一个临时 Key：运行时加 --auto-key（免费，24 小时 / 2 次额度）\n'
-                   '② 去 https://iai66.com/appship/key 免费领取 30 天 Key（5 次额度，无需注册），\n'
+            msg = ('未配置。两种方式：\n'
+                   '① 运行时加 --auto-key：直接使用内置的 2 次免费临时验证（无需注册、无需领 Key）\n'
+                   '② 领取个人 Preview Key：https://iai66.com/appship/key'
+                   '（30 天有效 · 5 次临时验证 · 无需注册），\n'
                    '   然后创建 client.json（项目 .appship/ 目录或 ~/.appship/）:\n'
                    '{\n  "api_url": "https://cp.appship.top",\n  "preview_key": "你领取的key"\n}')
             print(msg, file=sys.stderr) if not as_json else None
@@ -522,7 +533,7 @@ def _main():
     parser.add_argument('--destroy', metavar='JOB_ID', help='销毁指定 Preview')
     parser.add_argument('--json', action='store_true', help='输出 JSON')
     parser.add_argument('--auto-key', action='store_true',
-                        help='未配置 Key 时自动领取临时 Key（免费，24 小时 / 2 次额度）')
+                        help='未配置时启用内置免费体验额度（2 次临时验证，无需注册、无需领 Key）')
     args = parser.parse_args()
 
     if not any((args.pack, args.request, args.list, args.destroy)):
