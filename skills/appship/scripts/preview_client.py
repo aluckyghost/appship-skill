@@ -174,9 +174,9 @@ def api_request(cfg: dict, method: str, path: str, body: dict | None = None,
             if 'temp-key expired' in detail:
                 # 体验额度过期：用户不感知 Key，话术只讲「体验额度」
                 raise ApiError(
-                    'AppShip 的免费体验额度已到有效期（每次启用后 24 小时）。\n'
+                    '本次免费体验额度已到期（体验额度激活后 24 小时内有效，未用完的次数随之失效）。\n'
                     '本地检查和技术报告仍可继续免费使用。\n'
-                    '→ 继续预览请领取免费 Preview Key：https://iai66.com/appship/key\n'
+                    '→ 领取免费 Preview Key：https://iai66.com/appship/key\n'
                     '  （30 天有效 · 5 次临时验证 · 无需注册，领取后把 Key 交给 AppShip 即可继续预览）\n'
                     '→ 准备正式上线：https://iai66.com') from e
             if 'expired' in detail:
@@ -220,7 +220,8 @@ def ensure_temp_key(root: Path, cfg: dict, as_json: bool = False) -> dict:
     target.write_text(json.dumps(new_cfg, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     if not as_json:
         print(f'✅ 免费体验额度已启用（{target}）')
-        print('   内置免费体验：2 次临时验证（每次启用后 24 小时内有效）')
+        print('   新用户 2 次免费临时验证，无需注册')
+        print('   每次生成的临时验证环境有效 24 小时，到期自动销毁')
         print('   需要更多临时验证 → 领取个人 Preview Key：https://iai66.com/appship/key')
         print('   （30 天有效 · 5 次临时验证 · 无需注册，领取后把 Key 交给 AppShip 即可继续预览）')
     return new_cfg
