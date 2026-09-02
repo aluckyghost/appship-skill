@@ -2,6 +2,51 @@
 
 AI 帮你把软件做出来，AppShip 负责让它安全地跑到公网。
 
+## 30 秒安装
+
+AppShip 基于 **Agent Skills 开放标准**，可用于支持该标准的主流 AI Coding Agent（Claude Code、Cursor、Codex、Trae 等）。
+
+**前置要求：** Python 3.10+（本地检查必需）；预览功能需能访问 `cp.appship.top`。
+
+### 方式一：skills CLI 一键安装（推荐）
+
+```bash
+npx skills add aluckyghost/appship-skill
+```
+
+安装器会把本仓库 `skills/appship/` 完整装进你当前使用的 Agent（含 scripts/references/config 全部文件）。
+
+### 方式二：手动安装
+
+```bash
+git clone https://github.com/aluckyghost/appship-skill.git
+# 国内可用 Gitee：https://gitee.com/sosolososo/appship-skill
+```
+
+把 `appship-skill/skills/appship/` 整个目录放进你 Agent 的技能目录：
+
+| Agent | 技能目录 |
+|---|---|
+| Claude Code（全局） | `~/.claude/skills/appship/` |
+| Claude Code（项目级） | `你的项目/.claude/skills/appship/` |
+| Codex | `~/.codex/skills/appship/` |
+| Cursor / 其它 | `.agents/skills/appship/`（或该工具的 skills 目录） |
+
+Windows PowerShell 示例（Claude Code 全局）：
+
+```powershell
+git clone https://github.com/aluckyghost/appship-skill.git $env:TEMP\appship-skill
+Copy-Item -Recurse $env:TEMP\appship-skill\skills\appship $env:USERPROFILE\.claude\skills\appship
+```
+
+### 安装验证
+
+重启你的 Agent，对任意项目说一句：
+
+> 帮我看看这个项目下一步怎么办。
+
+看到 AppShip 开始跑安全检查和上线分析，就装好了。
+
 ## 不用学部署
 
 把项目做完以后，直接告诉 AppShip：
@@ -66,6 +111,8 @@ key 过期后创建预览会提示「预览 key 已过期——重新领取免�
 
 ## 命令行直跑（可选，不开对话时）
 
+在 `skills/appship/` 目录下执行（脚本相对 skill 根运行）：
+
 ```bash
 python scripts/ship.py ./your-project          # 一键体检：安全+运行+部署决策+上线清单
 python scripts/preview_client.py ./your-project --request    # 创建临时预览（已配置 Key 时）
@@ -114,14 +161,19 @@ python scripts/preview_client.py ./your-project --destroy <JOB_ID>  # 销毁预�
 
 ```text
 appship-skill/
-├── SKILL.md                 # Agent 对话决策流程 + 8 步 Workflow
 ├── README.md
-├── config/
-│   └── preview-policy.example.json
-├── docs/
-│   ├── CLOUD_AUTH.md
-│   └── PREVIEW_ARCHITECTURE.md
-├── scripts/                 # 11 个脚本（检测/安全/决策/打包/预览客户端）
+├── LICENSE                  # Apache-2.0
+├── skills/
+│   └── appship/             # Skill 本体（npx skills add 安装的就是这个目录）
+│       ├── SKILL.md         # Agent 对话决策流程 + 8 步 Workflow
+│       ├── config/
+│       │   └── preview-policy.example.json
+│       ├── references/      # 话术模板 / 正式上线决策树 / 报告格式
+│       └── scripts/         # 11 个脚本（检测/安全/决策/打包/预览客户端）
 └── tests/
-    └── smoke_test.py        # 72 项冒烟测试
+    └── smoke_test.py        # 冒烟测试
 ```
+
+## License
+
+Apache-2.0 © 宇视星（iai66.com）

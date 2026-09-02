@@ -1,7 +1,11 @@
 ---
 name: appship
-description: AppShip（AI 启航上线助手）——用户只需要说“帮我看看”“给我个临时地址”“帮我正式上线”等自然语言。AppShip 自动判断意图，先做安全与上线检查，再决定下一步、临时验证或正式上线流程。
-version: 0.4.1
+description: AppShip（AI 启航上线助手）——用户只需要说“帮我看看”“给我个临时地址”“帮我正式上线”等自然语言。AppShip 自动判断意图，先做安全与上线检查，再决定下一步、临时验证或正式上线流程。适用于：项目做完不知道怎么部署、想要临时预览地址、准备正式上线、检查项目安全风险。
+license: Apache-2.0
+compatibility: Requires Python 3.10+ and internet access for AppShip Preview (cp.appship.top).
+metadata:
+  author: yushixing
+  version: "0.4.1"
 ---
 
 # AppShip（AI 启航上线助手）Skill v0.4.1

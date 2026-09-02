@@ -19,7 +19,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-SCRIPTS = Path(__file__).parent.parent / 'scripts'
+SCRIPTS = Path(__file__).parent.parent / 'skills' / 'appship' / 'scripts'
 PY = sys.executable
 passed, failed = [], []
 
