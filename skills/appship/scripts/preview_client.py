@@ -221,7 +221,7 @@ def ensure_temp_key(root: Path, cfg: dict, as_json: bool = False) -> dict:
     if not as_json:
         print(f'✅ 免费体验额度已启用（{target}）')
         print('   新用户 2 次免费临时验证，无需注册')
-        print('   每次生成的临时验证环境有效 24 小时，到期自动销毁')
+        print('   每次生成的公网临时预览链接有效 24 小时，到期自动销毁')
         print('   需要更多临时验证 → 领取个人 Preview Key：https://iai66.com/appship/key')
         print('   （30 天有效 · 5 次临时验证 · 无需注册，领取后把 Key 交给 AppShip 即可继续预览）')
     return new_cfg
@@ -433,7 +433,7 @@ def print_user_report(root: Path, dec: dict, out: dict, ttl_h):
     print()
     for d in out.get('deliverables') or []:
         if d.get('kind') in ('web_url', 'api_url') and d.get('url'):
-            print(f"  {d['url']}   <- {'预览地址' if d['kind'] == 'web_url' else 'API 地址'}")
+            print(f"  {d['url']}   <- {'临时链接' if d['kind'] == 'web_url' else 'API 地址'}")
         elif d.get('summary'):
             print(f"  {d['summary']}")
     print(f"  有效期：{ttl_h or '?'} 小时（到期自动销毁）｜本次临时验证免费")
@@ -445,13 +445,13 @@ def print_user_report(root: Path, dec: dict, out: dict, ttl_h):
         print(f"🟢 严重安全风险：{risk} 项" if risk == 0 else f"🟡 严重安全风险：{risk} 项（需确认）")
     probe = out.get('url_probe')
     if probe == 'ok':
-        print('✅ 临时验证：正常（刚实测访问，页面正常打开）')
+        print('✅ 临时链接：正常（刚实测访问，页面正常打开）')
     elif probe == 'fallback':
-        print('✅ 临时验证：正常（HTTPS 尚未就绪，已先给 HTTP 地址）')
+        print('✅ 临时链接：正常（HTTPS 尚未就绪，已先给 HTTP 地址）')
     elif probe == 'pending':
-        print('⏳ 临时验证：已部署成功，地址解析生效中（几分钟内自动可用）')
+        print('⏳ 临时链接：已部署成功，解析生效中（几分钟内自动可用）')
     else:
-        print('✅ 临时验证：正常')
+        print('✅ 临时链接：正常')
     todo = head.get('todo')
     if todo is None:
         print('🚀 距离正式上线：运行 ship.py 获取上线清单')
@@ -513,7 +513,7 @@ def cmd_destroy(root: Path, job_id: str, as_json: bool) -> dict:
     else:
         print('✅ 销毁请求已提交')
         print(f"  Job ID: {job_id} → {resp['status']}")
-        print('  资源清理约需数秒，随后预览地址返回 404')
+        print('  资源清理约需数秒，随后临时链接返回 404')
     return resp
 
 

@@ -167,7 +167,7 @@ def main():
             print(f"  交付物: {d['kind']}{extra}")
         print(f"  {v['note']}")
         if any(d['kind'] == 'web_url' for d in v['deliverables']):
-            print(f"预览地址(示例): {p['preview_url']}")
+            print(f"临时链接(示例): {p['preview_url']}")
         print(f"节点建议: {p['region_hint']}")
         print(f"运行方式: {p.get('target', '')}")
         if 'cpu' in p:

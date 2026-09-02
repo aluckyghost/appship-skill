@@ -1,6 +1,13 @@
 ---
 name: appship
-description: AppShip helps turn AI-coded projects into something you can actually launch — 检查 · 验证 · 上线 · 托管. Local security checks, deployment decisions, free temporary preview, and production launch guidance. 用户只需说"帮我看看""给我个临时地址""帮我正式上线"等自然语言。适用于：项目做完不知道怎么部署、想要临时预览地址、准备正式上线、检查项目安全风险。
+description: >
+  AppShip 是一个 AI 应用上线助手，帮助把 AI 做出来的项目真正跑起来：
+  自动检查项目安全和上线条件，告诉用户还缺什么；
+  可以把 Web 项目临时运行到公网，生成一个别人也能直接打开的链接；
+  准备正式使用时，帮助判断域名、服务器、云平台和部署方案；
+  上线后还可衔接监控、备份、排障和托管。
+  用户只需说“帮我看看这个项目”“弄个链接给别人看”“帮我正式上线”等自然语言。
+  适用于：项目做完不知道怎么部署、想要一个能发给别人打开的链接、准备正式上线、检查项目安全风险。
 license: Apache-2.0
 compatibility: Requires Python 3.10+ and internet access for AppShip Preview (cp.appship.top).
 metadata:
@@ -12,7 +19,7 @@ metadata:
 
 ## 1. 核心定位
 
-AppShip 面向使用 Cursor / Trae / Claude Code / Codex 等 AI Coding 工具做出项目、
+AppShip 面向使用 TRAE / WorkBuddy / Claude Code / Codex 等 AI Coding 工具做出项目、
 但不一定懂部署和运维的用户。
 
 > 用户不需要学习 Preview、Production、Docker、OSS、ECS。
@@ -53,10 +60,10 @@ AppShip 面向使用 Cursor / Trae / Claude Code / Codex 等 AI Coding 工具做
 |---|---|---|
 | GUIDE | 不知道下一步怎么办 | 先检查，再告诉用户下一步两条简单路线 |
 | CHECK | 只想检查 | 检查并输出结果，**不擅自创建公网环境** |
-| PREVIEW | 想先跑起来看看 / 给别人看 | 检查通过后创建临时验证环境 |
+| PREVIEW | 想先跑起来看看 / 给别人看 | 检查通过后生成公网临时预览链接 |
 | PRODUCTION | 要长期对外使用 / 获客 / 收费 | 检查后进入正式上线决策树 |
 
-单独一句“帮我上线”无法判断时，**只问一个问题**（① 先弄一个临时地址看看效果
+单独一句“帮我上线”无法判断时，**只问一个问题**（① 先弄一个公网临时链接看看效果
 ② 正式上线，准备长期对外使用），不问 Docker、服务器、Redis、端口等技术问题。
 
 各意图的标准话术（首次回复 / 模糊追问 / BLOCKED / REVIEW_REQUIRED）：
@@ -112,7 +119,7 @@ python scripts/preview_client.py /path/to/project --request --auto-key
 
 **临时验证免费，分两档**（话术见 `references/conversation-templates.md` PREVIEW 一节）：
 
-1. **内置免费体验（--auto-key，首次预览零门槛）**：新用户可直接体验 **2 次免费临时验证**，无需注册、无需领 Key，客户端自动配置并写入 `.appship/client.json`。**用户层话术只叫「体验额度」，不提 Key**。每次生成的临时验证环境有效 **24 小时**，到期自动销毁（环境时效和次数是两回事，绝不说成「2 次/24 小时」）。额度用完后引导用户去官网领个人 Key。
+1. **内置免费体验（--auto-key，首次预览零门槛）**：新用户可直接体验 **2 次免费临时验证**，无需注册、无需领 Key，客户端自动配置并写入 `.appship/client.json`。**用户层话术只叫「体验额度」，不提 Key**。每次生成的公网临时预览链接有效 **24 小时**，到期自动销毁（链接时效和次数是两回事，绝不说成「2 次/24 小时」）。额度用完后引导用户去官网领个人 Key。
 2. **个人 Preview Key（官网自助）**：30 天有效 / 5 次临时验证，https://iai66.com/appship/key 领取（无需注册）。
 
 **用户粘贴 Key 时，Agent 直接代劳配置**——用户在对话里发来 Key（如「我的 AppShip Preview Key：appship-xxx」），Agent 立即创建/更新该项目 `.appship/client.json`：
@@ -127,6 +134,9 @@ python scripts/preview_client.py /path/to/project --request --auto-key
 可能交付：Web URL / API URL / API 文档 / Agent 测试页 / 验证报告 / 日志 / Artifact。
 Web、API、Agent 可以有 URL；CLI / MCP / Worker 可以只有验证结果。
 **未实现的能力必须明确说明，不得假装已经支持。**
+
+用户层说法按项目形态区分（不说内部术语）：**Web 项目 → 「生成一个别人也能直接打开的公网临时预览链接」**；
+API / Agent → 「生成可测试的接口地址或测试页」；CLI / Worker → 「在临时环境运行并给出验证结果」。
 
 ## 7. Security Rules
 
@@ -290,7 +300,7 @@ python scripts/ship.py /path/to/project --json   # 机器可读（CI/Control Pla
   ↓
 免费检查
   ↓
-临时验证环境（需要时）
+公网临时链接（需要时）
   ↓
 用户确认项目效果
   ↓
