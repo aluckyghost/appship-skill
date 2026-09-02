@@ -174,7 +174,7 @@ def api_request(cfg: dict, method: str, path: str, body: dict | None = None,
             if 'temp-key expired' in detail:
                 # 体验额度过期：用户不感知 Key，话术只讲「体验额度」
                 raise ApiError(
-                    '本次免费体验额度已到期（体验额度激活后 24 小时内有效，未用完的次数随之失效）。\n'
+                    '本次免费体验额度已到期（体验额度激活后 30 天内有效，未用完的次数随之失效）。\n'
                     '本地检查和技术报告仍可继续免费使用。\n'
                     '→ 领取免费 Preview Key：https://iai66.com/appship/key\n'
                     '  （30 天有效 · 5 次临时验证 · 无需注册，领取后把 Key 交给 AppShip 即可继续预览）\n'
