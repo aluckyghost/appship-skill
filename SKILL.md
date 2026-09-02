@@ -103,8 +103,13 @@ python scripts/ship.py /path/to/project
 ## 6. 临时验证（PREVIEW）
 
 ```bash
-python scripts/preview_client.py /path/to/project --request
+python scripts/preview_client.py /path/to/project --request --auto-key
 ```
+
+**Key 获取有两个来源，都免费**（话术见 `references/conversation-templates.md` PREVIEW 一节）：
+
+1. **临时 Key（--auto-key，首次预览零门槛）**：未配置 Key 时客户端自动领取（24 小时 / 2 次额度）并写入 `.appship/client.json`。额度用尽或过期后引导用户去官网领 30 天 Key。
+2. **30 天个人 Key（官网自助）**：用户从 https://iai66.com/appship/key 领取（无需注册，5 次额度）。
 
 **用户粘贴 Key 时，Agent 直接代劳配置**——用户在对话里发来 Key（如「我的 AppShip Preview Key：appship-xxx」），Agent 立即创建/更新该项目 `.appship/client.json`：
 

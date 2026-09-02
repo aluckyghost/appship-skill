@@ -17,6 +17,8 @@ preview_client.py — AppShip v0.4.1 / Preview Client
 用法:
     python scripts/preview_client.py /path/to/project --pack     # 仅打包
     python scripts/preview_client.py /path/to/project --request  # 打包+上传+等待就绪
+    python scripts/preview_client.py /path/to/project --request --auto-key
+                                     # 未配置 Key 时自动领临时 Key（免费，24h/2 次）
     python scripts/preview_client.py --list                      # 我的 Preview 列表
     python scripts/preview_client.py --destroy <job_id>          # 销毁
 """
@@ -132,10 +134,10 @@ def api_request(cfg: dict, method: str, path: str, body: dict | None = None,
                 multipart: tuple[str, bytes, str] | None = None) -> dict:
     url = cfg['api_url'].rstrip('/') + path
     # 自标识 UA：Python-urllib 默认 UA 会被 Cloudflare 等反代按已知爬虫拦截（HTTP 403 code 1010）
-    headers = {
-        'Authorization': f"Bearer {cfg['preview_key']}",
-        'User-Agent': 'AppShip-Preview-Client/0.4.1',
-    }
+    headers = {'User-Agent': 'AppShip-Preview-Client/0.4.1'}
+    # 领 Key 接口（/v1/key/request）无鉴权；其余接口带 preview_key
+    if cfg.get('preview_key'):
+        headers['Authorization'] = f"Bearer {cfg['preview_key']}"
 
     if multipart:
         field, data, filename = multipart
@@ -177,10 +179,42 @@ def api_request(cfg: dict, method: str, path: str, body: dict | None = None,
             raise ApiError(
                 '预览 key 无效。请到 https://iai66.com/appship/key 免费领取一个 Key，'
                 '然后更新 .appship/client.json 里的 preview_key') from e
+        # FastAPI HTTPException 的 detail 是 JSON（如 429 额度话术），解析出人话部分
+        try:
+            detail = json.loads(detail).get('detail', detail)
+        except (ValueError, AttributeError):
+            pass
         raise ApiError(f'HTTP {e.code}: {detail}') from e
 
 
 # ---------- 主流程 ----------
+
+DEFAULT_API_URL = 'https://cp.appship.top'
+
+
+def ensure_temp_key(root: Path, cfg: dict, as_json: bool = False) -> dict:
+    """--auto-key：未配置 Key 时自动领取临时 Key（免费，24h / 2 次额度）并写入项目配置。
+
+    首次预览零门槛；临时 Key 用完/过期后话术引导去官网领 30 天个人 Key。
+    """
+    api_url = cfg.get('api_url') or DEFAULT_API_URL
+    if not as_json:
+        print('未配置 Preview Key，正在自动领取临时 Key（免费）...')
+    resp = api_request({'api_url': api_url}, 'POST', '/v1/key/request?kind=temp', body={})
+    key = resp.get('key')
+    if not key:
+        raise ApiError(f'临时 Key 领取失败: {resp}')
+    new_cfg = {'api_url': api_url, 'preview_key': key}
+    target = root / '.appship' / 'client.json'
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(new_cfg, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    if not as_json:
+        print(f'✅ 已领取并保存临时 Key（{target}）')
+        print('   临时 Key：24 小时有效 / 2 次临时验证额度，到期自动失效。')
+        print('   想长期使用 → 领取 30 天免费 Key（5 次额度，无需注册）：https://iai66.com/appship/key')
+        print('   （领到后更新 client.json 里的 preview_key，或直接发给我）')
+    return new_cfg
+
 
 def cmd_pack(root: Path, as_json: bool) -> dict:
     result = make_bundle(root)
@@ -197,7 +231,7 @@ def cmd_pack(root: Path, as_json: bool) -> dict:
     return result
 
 
-def cmd_request(root: Path, as_json: bool, wait_timeout: int = 600) -> dict:
+def cmd_request(root: Path, as_json: bool, auto_key: bool = False, wait_timeout: int = 600) -> dict:
     sys.path.insert(0, str(Path(__file__).parent))
     from detect_stack import detect
     from security_scan import scan as security_scan
@@ -249,13 +283,25 @@ def cmd_request(root: Path, as_json: bool, wait_timeout: int = 600) -> dict:
 
     cfg = load_client_config(root)
     if not cfg.get('api_url') or not cfg.get('preview_key'):
-        msg = ('未配置 Control Plane。免费领取 Preview Key：https://iai66.com/appship/key\n'
-               '然后创建 client.json（项目 .appship/ 目录或 ~/.appship/）:\n'
-               '{\n  "api_url": "https://cp.appship.top",\n  "preview_key": "你领取的key"\n}')
-        print(msg, file=sys.stderr) if not as_json else None
-        if as_json:
-            print(json.dumps({'ok': False, 'error': msg}, ensure_ascii=False))
-        sys.exit(2)
+        if auto_key:
+            try:
+                cfg = ensure_temp_key(root, cfg, as_json)
+            except ApiError as e:
+                msg = f'自动领取临时 Key 失败：{e}'
+                print(msg, file=sys.stderr) if not as_json else None
+                if as_json:
+                    print(json.dumps({'ok': False, 'error': msg}, ensure_ascii=False))
+                sys.exit(2)
+        else:
+            msg = ('未配置 Control Plane。两种方式：\n'
+                   '① 让 AI 直接帮你领一个临时 Key：运行时加 --auto-key（免费，24 小时 / 2 次额度）\n'
+                   '② 去 https://iai66.com/appship/key 免费领取 30 天 Key（5 次额度，无需注册），\n'
+                   '   然后创建 client.json（项目 .appship/ 目录或 ~/.appship/）:\n'
+                   '{\n  "api_url": "https://cp.appship.top",\n  "preview_key": "你领取的key"\n}')
+            print(msg, file=sys.stderr) if not as_json else None
+            if as_json:
+                print(json.dumps({'ok': False, 'error': msg}, ensure_ascii=False))
+            sys.exit(2)
 
     bundle = make_bundle(root, extra_files)
     if not bundle.get('ok'):
@@ -475,6 +521,8 @@ def _main():
     parser.add_argument('--list', action='store_true', help='列出我的 Preview')
     parser.add_argument('--destroy', metavar='JOB_ID', help='销毁指定 Preview')
     parser.add_argument('--json', action='store_true', help='输出 JSON')
+    parser.add_argument('--auto-key', action='store_true',
+                        help='未配置 Key 时自动领取临时 Key（免费，24 小时 / 2 次额度）')
     args = parser.parse_args()
 
     if not any((args.pack, args.request, args.list, args.destroy)):
@@ -506,7 +554,7 @@ def _main():
     if args.pack:
         cmd_pack(root, args.json)
     elif args.request:
-        cmd_request(root, args.json)
+        cmd_request(root, args.json, auto_key=args.auto_key)
 
 
 if __name__ == '__main__':
